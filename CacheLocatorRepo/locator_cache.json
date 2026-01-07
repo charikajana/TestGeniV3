@@ -1,0 +1,5 @@
+{
+  "demoqa_com_links::switch_window::home link": "id=simpleLink >> text=\"Home\"",
+  "demoqa_com_checkbox::click::home checkbox": "id=tree-node >> text=\"Home\"",
+  "demoqa_com_text_box::click::text box": ".text"
+}

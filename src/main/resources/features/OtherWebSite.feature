@@ -1,0 +1,25 @@
+Feature: Navigation Feature
+
+  Scenario: Open link in new tab
+    When I navigate to "https://vinothqaacademy.com/multiple-windows/"
+    
+    # Use the new robust action: Click AND Switch in one atomic step using waitForPopup logic
+    When I click on New Browser Tab button and switch to new window
+    And wait for 10 seconds
+    Then Verify page title is "Demo Site – WebTable – Vinoth Tech Solutions"
+    And Enter "Chari" in Name field
+    And Enter "QA" in Role field
+    And Enter "Chari@vinoth.com" in Email Address field
+    And Enter "Chennai" in Location field
+    And Enter "IT" in Department field
+    And click on Add Row button
+    And wait for 5 seconds
+    And Verify new row is added with "Chari" in Name column
+    And take the screenshot
+    And select the checkbox in the row where Name column value is "Chari"
+    And click on Delete Selected Row button
+    Then validate "Chari" is deleted from the table
+    And wait for 10 seconds
+    And take the screenshot
+
+    

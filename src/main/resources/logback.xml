@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    
+    <!-- Console appender with colored output -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <!-- Simplified pattern for better readability with V3Logger's formatted output -->
+            <pattern>%d{HH:mm:ss.SSS} %-5level - %msg%n</pattern>
+        </encoder>
+    </appender>
+    
+    <timestamp key="bySecond" datePattern="yyyyMMdd_HHmmss"/>
+
+    <!-- File appender for detailed logs - New file per execution -->
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>logs/execution-${bySecond}.log</file>
+        <encoder>
+            <!-- No replace needed here because V3Logger handles stripping colors for fileLogger -->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    
+    <!-- CONSOLE LOGGER: Routes to Console ONLY -->
+    <logger name="testgeni.v3.console" level="TRACE" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <!-- FILE LOGGER: Routes to File ONLY -->
+    <logger name="testgeni.v3.file" level="TRACE" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <!-- Set logging levels for other components -->
+    <logger name="testgeni.v3" level="DEBUG"/>
+    <logger name="testgeni.v3.orchestration.TestRunner" level="TRACE"/>
+    <logger name="testgeni.v3.parser.GherkinStepParser" level="TRACE"/>
+    
+    <!-- Keep framework libraries quiet -->
+    <logger name="com.microsoft.playwright" level="WARN"/>
+    <logger name="org.slf4j" level="WARN"/>
+    <logger name="automation" level="DEBUG"/>
+    
+    <!-- Root logger - Routes to both by default, but our specific loggers above disable additivity -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+    
+</configuration>
