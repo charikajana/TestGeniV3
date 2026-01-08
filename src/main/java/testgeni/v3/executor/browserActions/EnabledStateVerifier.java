@@ -74,6 +74,8 @@ public class EnabledStateVerifier implements StateVerifier {
             return new ActionResult.Builder(passed)
                 .action(ActionType.VERIFY)
                 .target(intent.target)
+                .expectedValue(getExpectedDescription(canonicalState, negated))
+                .actualValue(isEnabled ? "enabled" : "disabled")
                 .status(passed ? ActionResult.ResultStatus.SUCCESS : ActionResult.ResultStatus.VERIFICATION_FAILED)
                 .message(message)
                 .detailedMessage(message)

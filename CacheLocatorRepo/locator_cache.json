@@ -2,12 +2,15 @@
   "demoqa_com_radio_button::verify_state::yes" : "id=yesRadio",
   "demoqa_com_radio_button::click::impressive" : "id=impressiveRadio",
   "demoqa_com_alerts::click::promtbutton" : "id=promtButton",
+  "demoqa_com_tabs::verify_state::\"lorem ipsum simply dummy text\"" : "id=demo-tabpane-what",
+  "demoqa_com_tabs::verify_state::\"it long established fact that reader will\"" : "id=demo-tabpane-use",
   "demoqa_com_text_box::fill::current address" : "id=currentAddress",
   "demoqa_com_text_box::fill::email" : "id=userEmail",
   "vinothqaacademy_com_multiple_windows::switch_window::new browser tab" : "id=button1 >> text=\"New Browser Tab\"",
   "demoqa_com_alerts::click::confirmbutton" : "id=confirmButton",
   "demoqa_com_alerts::click::alertbutton" : "id=alertButton",
   "selenium_dev_selenium_web_alerts_html::click::click me" : "id=alert",
+  "demoqa_com_tabs::click::origin tab" : "id=demo-tab-origin",
   "demoqa_com_buttons::click::click me" : "id=FdLXZ",
   "demoqa_com_auto_complete::click::blue" : "id=react-select-2-option-0",
   "demoqa_com_checkbox::click::home" : "id=tree-node-home",
@@ -26,5 +29,7 @@
   "demoqa_com_auto_complete::fill::type multiple color names" : "id=autoCompleteMultipleInput",
   "demoqa_com_links::switch_window::home" : "id=simpleLink",
   "demoqa_com_text_box::verify_state::current address" : "id=currentAddress-wrapper",
-  "demoqa_com_buttons::right_click::right click me" : "id=rightClickBtn"
+  "demoqa_com_buttons::right_click::right click me" : "id=rightClickBtn",
+  "demoqa_com_tabs::click::use tab" : "id=demo-tab-use",
+  "demoqa_com_tabs::click::what tab" : "id=demo-tab-what"
 }

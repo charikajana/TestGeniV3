@@ -112,11 +112,19 @@ public class VerifyActionExecutor extends BaseActionExecutor {
 
     private ActionResult buildResult(boolean passed, boolean isNegated, String expected, String actual) {
         boolean finalResult = isNegated ? !passed : passed;
+        String message;
+        if (finalResult) {
+            message = String.format("Verification Passed: Found [%s] as expected", actual);
+        } else {
+            message = String.format("Verification Failed: Expected [%s] but found [%s]", 
+                (isNegated ? "NOT " + expected : expected), actual);
+        }
+
         return new ActionResult.Builder(finalResult)
             .verificationPassed(finalResult)
             .expectedValue(isNegated ? "NOT " + expected : expected)
             .actualValue(actual)
-            .message(finalResult ? "Verification Passed" : "Verification Failed: Expected [" + expected + "] but found [" + actual + "]")
+            .message(message)
             .status(finalResult ? ActionResult.ResultStatus.SUCCESS : ActionResult.ResultStatus.VERIFICATION_FAILED)
             .build();
     }

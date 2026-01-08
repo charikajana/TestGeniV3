@@ -52,9 +52,26 @@ public class VisibilityStateVerifier implements StateVerifier {
             
             long duration = System.currentTimeMillis() - startTime;
             
+            // Capture text for reporting if visible
+            String actualValueFound = isVisible ? "visible" : "hidden";
+            if (isVisible) {
+                try {
+                    String text = locator.innerText();
+                    if (text != null && !text.trim().isEmpty()) {
+                        actualValueFound = text.trim();
+                        // Truncate if too long for console
+                        if (actualValueFound.length() > 100) {
+                            actualValueFound = actualValueFound.substring(0, 97) + "...";
+                        }
+                    }
+                } catch (Exception ignored) {}
+            }
+
             return new ActionResult.Builder(passed)
                 .action(ActionType.VERIFY)
                 .target(intent.target)
+                .expectedValue(getExpectedDescription(canonicalState, negated))
+                .actualValue(actualValueFound)
                 .status(passed ? ActionResult.ResultStatus.SUCCESS : ActionResult.ResultStatus.VERIFICATION_FAILED)
                 .message(message)
                 .detailedMessage(message)

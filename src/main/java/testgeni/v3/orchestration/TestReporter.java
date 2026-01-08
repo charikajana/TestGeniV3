@@ -18,22 +18,7 @@ public class TestReporter {
     }
 
     private void logToConsole(ActionResult result) {
-        String icon = "[FAIL]";
-        if (result.success) {
-            icon = "[PASS]";
-        } else if (result.status == ActionResult.ResultStatus.SKIPPED) {
-            icon = "[SKIP]";
-        }
-
-        System.out.printf("%s [%s] %s (%dms)%n", 
-            icon, 
-            result.action != null ? result.action : "UNKNOWN",
-            result.message,
-            result.durationMs);
-            
-        if (result.status == ActionResult.ResultStatus.FAILURE && result.detailedMessage != null) {
-            System.err.println("   └─ Error: " + result.detailedMessage);
-        }
+        // Redundant text logging disabled in favor of JSON output from V3Logger
     }
 
     public List<ActionResult> getResults() {

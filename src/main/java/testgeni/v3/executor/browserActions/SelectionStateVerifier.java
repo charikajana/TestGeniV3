@@ -92,6 +92,8 @@ public class SelectionStateVerifier implements StateVerifier {
             return new ActionResult.Builder(passed)
                 .action(ActionType.VERIFY)
                 .target(intent.target)
+                .expectedValue(getExpectedDescription(canonicalState, negated))
+                .actualValue(isChecked ? "selected" : "not selected")
                 .status(passed ? ActionResult.ResultStatus.SUCCESS : ActionResult.ResultStatus.VERIFICATION_FAILED)
                 .message(message)
                 .detailedMessage(message)
@@ -119,9 +121,11 @@ public class SelectionStateVerifier implements StateVerifier {
 
                 if (passed || isC) { // If it's actually selected or matches expectation
                      String msg = buildResultMessage(intent.target, canonicalState, negated, isC, passed);
-                     return new ActionResult.Builder(passed)
+                      return new ActionResult.Builder(passed)
                         .action(ActionType.VERIFY)
                         .target(intent.target)
+                        .expectedValue(getExpectedDescription(canonicalState, negated))
+                        .actualValue(isC ? "selected" : "not selected")
                         .status(passed ? ActionResult.ResultStatus.SUCCESS : ActionResult.ResultStatus.VERIFICATION_FAILED)
                         .message(msg)
                         .durationMs(duration)

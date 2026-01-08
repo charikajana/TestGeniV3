@@ -2,9 +2,14 @@ package testgeni.v3.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import testgeni.v3.core.domain.ActionResult;
 import testgeni.v3.core.domain.ElementMatch;
 import testgeni.v3.core.domain.StepIntent;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Enhanced logging utility for TestGeni v3 execution.
@@ -15,6 +20,8 @@ public class V3Logger {
 
     private static final Logger consoleLogger = LoggerFactory.getLogger("testgeni.v3.console");
     private static final Logger fileLogger = LoggerFactory.getLogger("testgeni.v3.file");
+    private static final ObjectMapper objectMapper = new ObjectMapper()
+            .enable(SerializationFeature.INDENT_OUTPUT);
 
     // ANSI Color Codes
     private static final String RESET = "\u001B[0m";
@@ -29,52 +36,57 @@ public class V3Logger {
     private static final String BOLD = "\u001B[1m";
 
     /**
-     * Log the start of a step execution with comprehensive details.
+     * Log the start of a step execution in JSON format.
      */
     public static void logStepExecution(String stepText, StepIntent intent, ElementMatch match, ActionResult result) {
-        StringBuilder logOutput = new StringBuilder();
-        logOutput.append("\n").append(PURPLE).append("┌──────────────────────────────────────────────────────────────────────────────").append(RESET).append("\n");
+        Map<String, Object> logObj = new LinkedHashMap<>();
         
-        // 1. Step Name
-        logOutput.append(PURPLE).append("│ ").append(BOLD).append("STEP: ").append(RESET).append(WHITE).append(stepText).append(RESET).append("\n");
+        // 1. Step Context
+        logObj.put("step", stepText);
         
         // 2. Parsed Intent
         if (intent != null) {
-            logOutput.append(PURPLE).append("│ ").append(CYAN).append("ACTION type:  ").append(RESET).append(intent.action).append("\n");
-            logOutput.append(PURPLE).append("│ ").append(CYAN).append("TARGET element: ").append(RESET).append(intent.target != null ? intent.target : "None").append("\n");
-            if (intent.value != null) {
-                logOutput.append(PURPLE).append("│ ").append(CYAN).append("VALUE passed:  ").append(RESET).append("'").append(intent.value).append("'").append("\n");
-            }
+            Map<String, Object> intentObj = new LinkedHashMap<>();
+            intentObj.put("action", intent.action != null ? intent.action.toString() : null);
+            intentObj.put("target", intent.target);
+            intentObj.put("value", intent.value);
+            logObj.put("intent", intentObj);
         }
         
         // 3. Locator Details
         if (match != null) {
-            logOutput.append(PURPLE).append("│ ").append(YELLOW).append("LOCATOR found: ").append(RESET).append(match.locatorString).append("\n");
-            logOutput.append(PURPLE).append("│ ").append(YELLOW).append("MATCH info:    ").append(RESET).append(match.strategy).append(" (").append((int)(match.confidence * 100)).append("% confidence)").append("\n");
+            Map<String, Object> matchObj = new LinkedHashMap<>();
+            matchObj.put("locator", match.locatorString);
+            matchObj.put("strategy", match.strategy != null ? match.strategy.toString() : null);
+            matchObj.put("confidence", match.confidence);
             if (match.tagName != null) {
-                String meta = match.tagName + (match.id != null ? " id=" + match.id : "");
-                logOutput.append(PURPLE).append("│ ").append(YELLOW).append("ELEMENT tags:  ").append(RESET).append("<").append(meta).append(">").append("\n");
+                matchObj.put("tagName", match.tagName);
+                matchObj.put("id", match.id);
             }
+            logObj.put("element", matchObj);
         }
         
         // 4. Result Status
         if (result != null) {
-            String statusColor = getStatusColor(result.status);
-            String icon = getStatusIcon(result.status);
+            Map<String, Object> resultObj = new LinkedHashMap<>();
+            resultObj.put("status", result.status != null ? result.status.toString() : null);
+            resultObj.put("message", result.message);
+            resultObj.put("durationMs", result.durationMs);
             
-            logOutput.append(PURPLE).append("│ ").append(statusColor).append(icon).append(" STATUS:       ").append(result.status).append(RESET).append("\n");
-            logOutput.append(PURPLE).append("│ ").append(statusColor).append("MESSAGE:      ").append(result.message).append(RESET).append("\n");
-            
-            if (result.durationMs > 0) {
-                logOutput.append(PURPLE).append("│ ").append(BLUE).append("DURATION:     ").append(RESET).append(result.durationMs).append("ms").append("\n");
+            if (result.expectedValue != null || result.actualValue != null) {
+                resultObj.put("expected", result.expectedValue);
+                resultObj.put("actual", result.actualValue);
             }
+            logObj.put("result", resultObj);
         }
         
-        logOutput.append(PURPLE).append("└──────────────────────────────────────────────────────────────────────────────").append(RESET);
-        
-        String fullOutput = logOutput.toString();
-        consoleLogger.info(fullOutput);
-        fileLogger.info(stripColors(fullOutput));
+        try {
+            String jsonOutput = objectMapper.writeValueAsString(logObj);
+            consoleLogger.info("\n{}\n", jsonOutput);
+            fileLogger.info(jsonOutput);
+        } catch (Exception e) {
+            error("Failed to serialize step execution to JSON", e);
+        }
     }
 
     public static void info(String message) {
