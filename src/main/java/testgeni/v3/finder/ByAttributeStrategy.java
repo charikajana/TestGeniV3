@@ -17,16 +17,27 @@ public class ByAttributeStrategy implements LocatorStrategy {
 
     @Override
     public List<ScannedElement> findCandidates(List<ScannedElement> candidates, StepIntent intent) {
-        String target = intent.target.toLowerCase().replace(" ", "-");
-        String originalTarget = intent.target.toLowerCase();
+        String tempTarget = intent.target.toLowerCase().replace(" ", "-");
+        if (tempTarget.startsWith("#")) {
+            tempTarget = tempTarget.substring(1);
+        }
+        final String target = tempTarget;
+        
+        String tempOriginal = intent.target.toLowerCase();
+        if (tempOriginal.startsWith("#")) {
+            tempOriginal = tempOriginal.substring(1);
+        }
+        final String originalTarget = tempOriginal;
         
         return candidates.stream()
             .filter(el -> {
-                String id = el.attributes.getOrDefault("id", "").toLowerCase();
+                String elId = el.id.toLowerCase();
+                String attrId = el.attributes.getOrDefault("id", "").toLowerCase();
                 String name = el.attributes.getOrDefault("name", "").toLowerCase();
                 String testId = el.attributes.getOrDefault("data-testid", "").toLowerCase();
                 
-                return id.equals(target) || id.equals(originalTarget) ||
+                return elId.equals(target) || elId.equals(originalTarget) ||
+                       attrId.equals(target) || attrId.equals(originalTarget) ||
                        name.equals(target) || name.equals(originalTarget) ||
                        testId.equals(target) || testId.equals(originalTarget);
             })

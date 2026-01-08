@@ -125,15 +125,15 @@ public class PlaywrightScanner implements PageScanner {
                 const elements = [];
                 
                 function isVisible(el) {
-                    const style = window.getComputedStyle(el);
-                    if (style.display === 'none') return false;
-                    if (style.visibility === 'hidden') return false;
-                    if (style.opacity === '0') return false;
-                    
                     const tagName = el.tagName.toLowerCase();
                     if (['input', 'select', 'textarea', 'button', 'a'].includes(tagName)) {
                         return true; 
                     }
+                    
+                    const style = window.getComputedStyle(el);
+                    if (style.display === 'none') return false;
+                    if (style.visibility === 'hidden') return false;
+                    if (style.opacity === '0') return false;
                     
                     return el.offsetWidth > 0 && el.offsetHeight > 0;
                 }

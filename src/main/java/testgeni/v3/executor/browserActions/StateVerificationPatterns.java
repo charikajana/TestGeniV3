@@ -39,7 +39,8 @@ public class StateVerificationPatterns {
         "greyed out", "greyedout", "is greyed out",
         "grayed out", "grayedout", "is grayed out",
         "inactive", "isinactive", "is inactive",
-        "readonly", "is readonly"
+        "readonly", "is readonly", "read-only", "is read-only",
+        "restricted", "is restricted"
     );
     
     // ========================================

@@ -12,9 +12,6 @@ public class IdSelectorStrategy implements SelectorStrategy {
         String text = el.text != null ? el.text.trim() : "";
         
         if (idAttr != null && !idAttr.isEmpty() && !idAttr.startsWith("tg-")) {
-            if (!text.isEmpty() && text.length() < 50) {
-                 return "id=" + idAttr + " >> text=\"" + text.replace("\"", "\\\"") + "\"";
-            }
             return "id=" + idAttr;
         }
         return null;

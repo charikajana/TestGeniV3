@@ -25,7 +25,19 @@ public class SelectionStateVerifier implements StateVerifier {
         
         try {
             // Get actual state
-            boolean isChecked = locator.isChecked();
+            boolean isChecked;
+            try {
+                isChecked = locator.isChecked();
+            } catch (Exception e) {
+                // If the element itself is not checkable, it might be a wrapper (like Bootstrap's custom-control).
+                // Try finding a native checkable child element.
+                Locator childInput = locator.locator("input[type='checkbox'], input[type='radio']").first();
+                if (childInput.count() > 0) {
+                    isChecked = childInput.isChecked();
+                } else {
+                    throw e; // Rethrow if no checkable child found
+                }
+            }
             
             // Determine expected state based on canonical state
             boolean expectedState = switch (canonicalState) {

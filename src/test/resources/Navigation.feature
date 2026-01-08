@@ -22,7 +22,7 @@ Feature: Navigation Feature
     And wait for 10 seconds
     And click on Text Box
     And wait for 10 seconds
-    And click on Links
+    When I navigate to "https://demoqa.com/links"
     When I click on Home link and switch to new window
     And wait for 10 seconds
     Then Verify URL is exactly "https://demoqa.com/"
@@ -31,14 +31,14 @@ Feature: Navigation Feature
     And switch to parent window
     And wait for 5 seconds
     And Click on Text Box
-    And click on Links
+    And wait for 5 seconds
+    When I navigate to "https://demoqa.com/links"
     Then Verify URL is exactly "https://demoqa.com/links"
     And click on Text Box
     And wait for 10 seconds
-    And click on Links
+    When I navigate to "https://demoqa.com/links"
     When I click on Home link and switch to new window
     And wait for 10 seconds
     Then Verify URL is exactly "https://demoqa.com/"
     Then Wait for 3 seconds
     When I close new window
-    Then Wait for 20 seconds

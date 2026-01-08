@@ -65,7 +65,9 @@ public class NoiseWords {
      * Examples: css, xpath, attribute, role, class
      */
     public static final Set<String> TECHNICAL_TERMS = Set.of(
-        "css", "xpath", "attribute", "role", "class"
+        "css", "xpath", "attribute", "role", "class",
+        "button", "radio", "checkbox", "dropdown", "link",
+        "input", "field", "item", "list", "table", "form", "textarea"
     );
     
     // ========================================

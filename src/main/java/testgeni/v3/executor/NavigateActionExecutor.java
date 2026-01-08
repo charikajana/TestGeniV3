@@ -24,7 +24,9 @@ public class NavigateActionExecutor extends BaseActionExecutor {
                 }
                 if (url == null) return ActionResult.failure("No URL specified for navigation");
                 
-                page.navigate(url, new Page.NavigateOptions().setWaitUntil(WaitUntilState.LOAD));
+                page.navigate(url, new Page.NavigateOptions()
+                    .setWaitUntil(WaitUntilState.DOMCONTENTLOADED)
+                    .setTimeout(60000)); // 60 seconds timeout
                 return ActionResult.success("Navigated to " + url);
 
             case GO_BACK:

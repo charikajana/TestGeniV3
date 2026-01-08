@@ -16,5 +16,5 @@ public class DefaultTextSelectorStrategy implements SelectorStrategy {
     }
 
     @Override
-    public int priority() { return 10; }
+    public int priority() { return 25; }
 }

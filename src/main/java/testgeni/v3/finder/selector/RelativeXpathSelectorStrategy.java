@@ -12,9 +12,9 @@ public class RelativeXpathSelectorStrategy implements SelectorStrategy {
         String tag = el.tagName != null ? el.tagName : "*";
         String text = el.text != null ? el.text.trim() : "";
         
-        // 1. Tag + Text contains (Very robust relative XPath)
+        // 1. Tag + Text contains (Using . instead of text() for nested matches)
         if (!text.isEmpty() && text.length() < 50) {
-            return String.format("xpath=//%s[contains(text(), '%s')]", 
+            return String.format("xpath=//%s[contains(., '%s')]", 
                 tag, text.replace("'", ""));
         }
         
@@ -32,5 +32,5 @@ public class RelativeXpathSelectorStrategy implements SelectorStrategy {
     }
 
     @Override
-    public int priority() { return 20; } // Low priority fallback
+    public int priority() { return 10; } // Low priority fallback
 }

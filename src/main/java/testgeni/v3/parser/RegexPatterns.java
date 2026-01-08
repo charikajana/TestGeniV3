@@ -200,7 +200,11 @@ public class RegexPatterns {
      */
     public static final Set<String> VERIFICATION_ATTRIBUTES = Set.of(
         "displayed", "visible", "enabled", "disabled", "selected", "checked",
-        "readonly", "required", "focused", "present", "exists"
+        "required", "focused", "present", "exists",
+        "isenabled", "isdisabled", "ischecked", "isselected", "isactive", 
+        "isclickable", "isinteractive", "greyed out", "grayed out", 
+        "inactive", "read-only", "readonly", "restricted",
+        "active", "interactive", "clickable"
     );
     
     /**

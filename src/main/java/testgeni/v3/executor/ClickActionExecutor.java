@@ -27,10 +27,21 @@ public class ClickActionExecutor extends BaseActionExecutor {
         
         // ENHANCEMENT: Find clickable parent if current element is not interactive
         Locator clickableElement = findClickableParent(locator, page);
-        final Locator finalLocator = (clickableElement != null) ? clickableElement : locator;
+        Locator targetLocator = (clickableElement != null) ? clickableElement : locator;
         
-        // 1. Robust check for Radio/Checkbox
-        String tagName = (String) finalLocator.evaluate("el => el.tagName.toLowerCase()");
+        // 1. Robust check for Radio/Checkbox Wrapper
+        String tagName = (String) targetLocator.evaluate("el => el.tagName.toLowerCase()");
+        if (!"input".equals(tagName)) {
+            Locator innerInput = targetLocator.locator("input[type='radio'], input[type='checkbox']").first();
+            if (innerInput.count() > 0) {
+                testgeni.v3.util.V3Logger.debug("Found radio/checkbox inside wrapper, upgrading target for better click handling");
+                targetLocator = innerInput;
+                tagName = "input";
+            }
+        }
+        
+        final Locator finalLocator = targetLocator;
+
         String type = (String) finalLocator.evaluate("el => el.type");
         
         if ("input".equals(tagName) && ("radio".equals(type) || "checkbox".equals(type))) {
@@ -73,7 +84,15 @@ public class ClickActionExecutor extends BaseActionExecutor {
             }
             return ActionResult.success("Clicked " + intent.target + " and switched to new window/tab");
         } else {
-            finalLocator.click(options);
+            // Try Playwright click first, fallback to JavaScript click if it fails
+            try {
+                finalLocator.click(options);
+            } catch (Exception e) {
+                testgeni.v3.util.V3Logger.debug("Playwright click failed, trying JavaScript click: " + e.getMessage());
+                // Fallback to JavaScript click
+                finalLocator.evaluate("el => el.click()");
+                testgeni.v3.util.V3Logger.debug("JavaScript click succeeded");
+            }
         }
 
         return ActionResult.success(intent.action.name() + " performed on " + intent.target);

@@ -25,12 +25,14 @@ public class V3RegressionRunner {
 
     // List of core features that define the "Gold Standard" of framework stability
     private static final List<String> GOLD_FEATURES = Arrays.asList(
-        "src/main/resources/features/Alerts.feature",
-        "src/main/resources/features/AutoComplete.feature",
-        "src/main/resources/features/ReproductionWindow.feature",
-        "src/main/resources/features/Buttons.feature",
-        "src/main/resources/features/TextBox.feature",
-        "src/main/resources/features/Navigation.feature"
+        "src/test/resources/Alerts.feature",
+        "src/test/resources/AutoComplete.feature",
+        "src/test/resources/ReproductionWindow.feature",
+        "src/test/resources/Buttons.feature",
+        "src/test/resources/TextBox.feature",
+        "src/test/resources/Navigation.feature",
+        "src/test/resources/StateVerification.feature",
+        "src/test/resources/RadioButton.feature"
     );
 
     public static void main(String[] args) {
@@ -64,8 +66,8 @@ public class V3RegressionRunner {
 
         try (Playwright playwright = Playwright.create()) {
             Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions()
-                .setHeadless(true) // Regression usually runs headless
-                .setSlowMo(0));
+                .setHeadless(false) // Changed to headed mode for visibility
+                .setSlowMo(100)); // Added a small delay for visibility
             
             TestConfig config = TestConfig.builder()
                 .captureScreenshots(true)

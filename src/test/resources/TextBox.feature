@@ -1,8 +1,6 @@
-Feature: Robot Demo
-  Scenario: Navigate to DemoQA and Click Elements
-    Given Open the browser and go to "https://demoqa.com/"
-    When Click Elements tab
-    And click on Text box
+Feature: Text Box Automation
+  Scenario: Interact with Text Box
+    Given Open the browser and go to "https://demoqa.com/text-box"
     And Enter Full Name "chari"
     And Enter Email "abce@gmail.com"
     And Enter Current Address "NRT"

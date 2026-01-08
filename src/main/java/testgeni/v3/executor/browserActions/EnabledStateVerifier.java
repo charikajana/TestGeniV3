@@ -24,7 +24,26 @@ public class EnabledStateVerifier implements StateVerifier {
         
         try {
             // Get actual state
-            boolean isEnabled = locator.isEnabled();
+            boolean isEnabled = (Boolean) locator.evaluate(
+                "function(el) { " +
+                "  function isElDisabled(node) { " +
+                "    if (!node || node.nodeType !== 1) return false; " +
+                "    return node.disabled || " +
+                "           node.classList.contains('disabled') || " +
+                "           node.getAttribute('aria-disabled') === 'true' || " +
+                "           node.getAttribute('disabled') !== null || " +
+                "           window.getComputedStyle(node).pointerEvents === 'none'; " +
+                "  } " +
+                "  if (isElDisabled(el)) return false; " +
+                "  var parent = el.parentElement; " +
+                "  for (var i = 0; i < 3 && parent; i++) { " +
+                "    if (isElDisabled(parent)) return false; " +
+                "    parent = parent.parentElement; " +
+                "  } " +
+                "  var input = el.querySelector('input, button, select, textarea'); " +
+                "  if (input && isElDisabled(input)) return false; " +
+                "  return true; " +
+                "}");
             
             // Determine expected state based on canonical state
             boolean expectedState = switch (canonicalState) {

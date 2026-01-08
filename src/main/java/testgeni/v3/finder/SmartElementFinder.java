@@ -168,7 +168,7 @@ public class SmartElementFinder implements ElementFinder {
                 ));
             }
             
-            ElementMatch matchResult = buildBidirectionalMatch(page, bidirectionalResult, intent, findDuration);
+            ElementMatch matchResult = buildBidirectionalMatch(page, bidirectionalResult, intent, findDuration, elements);
             
             // apply proximity matching if needed
             if (intent.action.isTextInputAction() || intent.action == ActionType.SELECT) {
@@ -223,7 +223,7 @@ public class SmartElementFinder implements ElementFinder {
 
         // 8. Build the final Playwright Locator and Match response
         long findDuration = System.currentTimeMillis() - startTime;
-        ElementMatch match = buildMatch(page, bestEval, intent, findDuration, evaluations.size());
+        ElementMatch match = buildMatch(page, bestEval, intent, findDuration, evaluations.size(), elements);
         
         // ========================================
         // NEW: Compatibility Filtering & Proximity Matching
@@ -274,7 +274,7 @@ public class SmartElementFinder implements ElementFinder {
             
         if (bestDescendant != null) {
             V3Logger.info("Proximity MATCH: Found compatible descendant: " + bestDescendant.tagName + " (ID: " + bestDescendant.id + ")");
-            return buildBestMatchResult(page, bestDescendant, match, "Proximity: Compatible Descendant");
+            return buildBestMatchResult(page, bestDescendant, match, "Proximity: Compatible Descendant", allElements);
         }
         
         // 2. Search for compatible SIBLINGS / NEARBY Elements
@@ -289,7 +289,7 @@ public class SmartElementFinder implements ElementFinder {
                 ScannedElement candidate = allElements.get(i);
                 if (candidate.isVisible && intent.action.isCompatibleWith(candidate.detectedType)) {
                     V3Logger.info("Proximity MATCH: Found compatible nearby relationship: " + candidate.tagName + " (ID: " + candidate.id + ")");
-                    return buildBestMatchResult(page, candidate, match, "Proximity: Nearby Element");
+                    return buildBestMatchResult(page, candidate, match, "Proximity: Nearby Element", allElements);
                 }
             }
         }
@@ -305,7 +305,7 @@ public class SmartElementFinder implements ElementFinder {
                 
             if (cousin != null) {
                 V3Logger.info("Proximity MATCH: Found compatible cousin via parent: " + cousin.tagName + " (ID: " + cousin.id + ")");
-                return buildBestMatchResult(page, cousin, match, "Proximity: Sibling of Target Container");
+                return buildBestMatchResult(page, cousin, match, "Proximity: Sibling of Target Container", allElements);
             }
         }
         
@@ -313,8 +313,8 @@ public class SmartElementFinder implements ElementFinder {
         return match;
     }
 
-    private ElementMatch buildBestMatchResult(Page page, ScannedElement el, ElementMatch originalMatch, String reason) {
-        String selector = generatePlaywrightSelector(el);
+    private ElementMatch buildBestMatchResult(Page page, ScannedElement el, ElementMatch originalMatch, String reason, List<ScannedElement> allElements) {
+        String selector = generatePlaywrightSelector(el, allElements);
         Locator locator = page.locator(selector).first();
         
         return new ElementMatch.Builder(locator, originalMatch.confidence, ElementMatch.MatchStrategy.BY_SEMANTIC)
@@ -354,9 +354,9 @@ public class SmartElementFinder implements ElementFinder {
         return evaluations.get(0).element;
     }
     
-    private ElementMatch buildBidirectionalMatch(Page page, BidirectionalMatcher.BidirectionalMatchResult result, StepIntent intent, long durationMs) {
+    private ElementMatch buildBidirectionalMatch(Page page, BidirectionalMatcher.BidirectionalMatchResult result, StepIntent intent, long durationMs, List<ScannedElement> allElements) {
         ScannedElement el = result.forwardMatch.element;
-        String selector = generatePlaywrightSelector(el);
+        String selector = generatePlaywrightSelector(el, allElements);
         Locator locator = page.locator(selector).first();
         
         // Build score breakdown
@@ -387,9 +387,9 @@ public class SmartElementFinder implements ElementFinder {
             .build();
     }
 
-    private ElementMatch buildMatch(Page page, MatchEvaluation eval, StepIntent intent, long durationMs, int totalCandidates) {
+    private ElementMatch buildMatch(Page page, MatchEvaluation eval, StepIntent intent, long durationMs, int totalCandidates, List<ScannedElement> allElements) {
         ScannedElement el = eval.element;
-        String selector = generatePlaywrightSelector(el);
+        String selector = generatePlaywrightSelector(el, allElements);
         Locator locator = page.locator(selector).first();
 
         return new ElementMatch.Builder(locator, eval.score.totalScore, ElementMatch.MatchStrategy.BY_SEMANTIC)
@@ -408,8 +408,8 @@ public class SmartElementFinder implements ElementFinder {
             .build();
     }
 
-    private String generatePlaywrightSelector(ScannedElement el) {
-        return selectorEngine.generateBestSelector(el);
+    private String generatePlaywrightSelector(ScannedElement el, List<ScannedElement> allElements) {
+        return selectorEngine.generateBestSelector(el, allElements);
     }
 
     private ElementMatch createErrorMatch(String message, ElementMatch.MatchStatus status) {
