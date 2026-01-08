@@ -24,6 +24,13 @@ public class IntentSpecializer {
      */
     public ActionType specialize(ActionType action, String cleanStep, String verificationAttribute) {
         if (action == ActionType.VERIFY) {
+            // Priority: If the step contains "contains" or "matches", it's a text verification if we have a value
+            String lowerStep = cleanStep.toLowerCase();
+            if (lowerStep.contains(" contains ") || lowerStep.contains(" matches ")) {
+                V3Logger.trace("Action Specialized", "VERIFY -> VERIFY_TEXT (contains/matches)");
+                return ActionType.VERIFY_TEXT;
+            }
+
             if (stateVerifierRegistry.isStateVerification(verificationAttribute)) {
                 V3Logger.trace("Action Specialized", "VERIFY -> VERIFY_STATE (" + verificationAttribute + ")");
                 return ActionType.VERIFY_STATE;
@@ -40,12 +47,29 @@ public class IntentSpecializer {
      */
     public String extractVerificationAttribute(String step) {
         String lowerStep = step.toLowerCase();
+
+        // New Priority: Check for explicit text verification keywords
+        if (lowerStep.contains(" contains ")) return "text";
+        if (lowerStep.contains(" matches ")) return "text";
         
         // PRIORITY 1: Check for STATE attributes (boolean checks)
+        String bestMatch = "displayed";
+        int lastPos = -1;
+        
         for (String synonym : StateVerificationPatterns.ALL_STATE_SYNONYMS) {
-            if (lowerStep.matches(".*\\b" + java.util.regex.Pattern.quote(synonym) + "\\b.*")) {
-                return synonym;
+            java.util.regex.Pattern p = java.util.regex.Pattern.compile("\\b" + java.util.regex.Pattern.quote(synonym) + "\\b");
+            java.util.regex.Matcher m = p.matcher(lowerStep);
+            
+            while (m.find()) {
+                if (m.start() > lastPos) {
+                    lastPos = m.start();
+                    bestMatch = synonym;
+                }
             }
+        }
+        
+        if (lastPos != -1) {
+            return bestMatch;
         }
         
         // PRIORITY 2: Check for CONTENT attributes (text/value checks)

@@ -15,6 +15,11 @@ public class StabilityInterceptor implements ExecutionInterceptor {
 
     @Override
     public void intercept(TestContext context, Page page, ElementMatch match, StepIntent intent) {
+        // Skip stability checks for tooltips - they disappear if we wait!
+        if (intent.isTooltipVerification()) {
+            return;
+        }
+
         // 1. Wait for Network Idle (if configured)
         try {
             V3Logger.trace("StabilityInterceptor", "Checking page stability...");
